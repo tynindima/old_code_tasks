@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class Tusk extends Component {
+export default class Task extends Component {
   state = {
     items: ['Kolya', 'Valya', 'Petya', 'Ivan', 'Dima']
   }
@@ -29,7 +29,7 @@ export default class Tusk extends Component {
         <button onClick={() => this.delCurrentItem(i)}>del</button>
       </li>
     ));
-  
+
     return (
       <div>
         <ul>

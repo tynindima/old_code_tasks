@@ -15,7 +15,7 @@ const ititialUsers = [
   {name: 'Петя', age: 50},
 ];
 
-const Tusk6 = () => {
+const Task6 = () => {
   const [date, setDate] = useState('');
   const [fullName, setfullName] = useState('');
   const [num1, setNum1] = useState('');
@@ -313,6 +313,6 @@ const Tusk6 = () => {
   )
 }
 
-export default Tusk6;
+export default Task6;
 
 
