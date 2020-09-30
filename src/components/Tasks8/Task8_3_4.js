@@ -47,14 +47,14 @@ const Task8_3_4 = () => {
 
   //paragraphs with inputs
   const paragraphOfNames = names.map(item => (
-    <div>
+    <div key={item.id}>
       <input
         type="checkbox"
         name="isChecked"
         checked={item.isChecked}
         onChange={() => handlerNamesCheck(item.id)}
       />
-      <p key={item.id} style={{display: item.isChecked ? 'block' : 'none'}}>
+      <p style={{display: item.isChecked ? 'block' : 'none'}}>
         {item.name}
       </p>
     </div>
