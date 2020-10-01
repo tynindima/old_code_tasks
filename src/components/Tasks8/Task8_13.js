@@ -54,6 +54,7 @@ const Pagination = (props) => {
   for (let i = 1; i <= Math.ceil(workers.length / worksPerPage); i++) {
     buttons.push(i);
   }
+  console.log(buttons);
 
   const listOfButtons = buttons.map((item) => (
     <li
