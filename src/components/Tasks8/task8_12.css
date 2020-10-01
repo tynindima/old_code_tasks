@@ -1,0 +1,22 @@
+.table {
+  border-collapse: collapse;
+}
+
+.col {
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.box {
+  margin: 10px 0;
+}
+
+.label {
+  display: inline-block;
+  width: 66px;
+  text-transform: capitalize;
+}
+
+.input {
+  width: 232px;
+}
