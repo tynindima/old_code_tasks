@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 const Task8_14 = () => {
   const [cities, setCities] = useState([]);
-  const [numOfCity, setNumOfCity] = useState(0);
+  const [numOfCity, setNumOfCity] = useState(null);
   const [city, setCity] = useState('');
 
   const handlerChange = (e) => {

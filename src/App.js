@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import Tusk from './components/Tasks8/Task8_14';
+import Tusk from './components/Tasks8/Task8_15';
 
 function App() {
 
