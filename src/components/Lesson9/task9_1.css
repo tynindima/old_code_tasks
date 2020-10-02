@@ -1,0 +1,19 @@
+.list {
+  margin: 0 auto;
+  padding: 0;
+  max-width: 800px;
+}
+
+.item {
+  list-style: none;
+  background-color: grey;
+  border-radius: 8px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.item p {
+  margin: 0;
+  line-height: 1.5em;
+  color: azure;
+}
