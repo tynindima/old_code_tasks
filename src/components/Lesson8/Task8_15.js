@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useRef, useState } from 'react';
 
 const cur = [
   {
@@ -28,65 +28,72 @@ const cur = [
 ];
 
 const Task8_15 = () => {
-  const [currency, setCurrency] = useState('');
-  const [firstCurrency, setFirstCurrency] = useState('usd');
-  const [secondCurrency, setSecondCurrency] = useState('usd');
-  const [convertedSum, setConvertedSum] = useState(null);
+  const currensies = useRef(cur);
+  const currency = useChangeInput('');
+  const firstCurrency = useChangeInput('usd');
+  const secondCurrency = useChangeInput('usd');
+  const convertedSum = useSumbitConvertCurrency(currensies.current, currency.value, firstCurrency.value, secondCurrency.value);
+
+  return (
+    <div>
+      <form onSubmit={convertedSum.onSubmit}>
+        <input
+          type="number"
+          name="currency"
+          autoComplete="off"
+          value={currency.value}
+          onChange={currency.onChange}
+        />
+        <CurrencySelect
+          name="firstCurrency"
+          value={firstCurrency.value}
+          onChange={firstCurrency.onChange}
+        />
+        <CurrencySelect
+          name="secondCurrency"
+          value={secondCurrency.value}
+          onChange={secondCurrency.onChange}
+        />
+        <button type="submit">Convert</button>
+      </form>
+      <p>Converted sum: {convertedSum.value}</p>
+    </div>
+  )
+}
+
+function useChangeInput(initialState) {
+  const [value, setValue] = useState(initialState);
 
   const handlerChange = (e) => {
-    const { name, value } = e.target;
+      e.target.name === 'currency' ? setValue(e.target.value.replace(/[^\d]/g, '')) : setValue(e.target.value)
+      setValue(e.target.value);
+  }
 
-    switch (name) {
-      case 'currency':
-        setCurrency(value.replace(/[^\d]/g, ''));
-        break;
-      case 'firstCurrency':
-        setFirstCurrency(value);
-        break;
-      case 'secondCurrency':
-        setSecondCurrency(value);
-        break;
-      default:
-        break;
-    }
+  return {
+    value,
+    onChange: handlerChange,
   };
+};
+
+function useSumbitConvertCurrency(arrayOfCurrencies, currency, first, second) {
+  const [value, setValue] = useState(null);
+
 
   const handlerSubmitConverCur = (e) => {
     e.preventDefault();
 
     //finds selected currency
-    const sol = cur.find(item => item.base === firstCurrency);
+    const sol = arrayOfCurrencies.find(item => item.base === first);
     //take value of currency
-    const cunvertIndex = sol.ratest[secondCurrency];
+    const cunvertIndex = sol.ratest[second];
 
-    setConvertedSum((currency * cunvertIndex).toFixed(2));
+    setValue((currency * cunvertIndex).toFixed(2));
   };
 
-  return (
-    <div>
-      <form onSubmit={handlerSubmitConverCur}>
-        <input
-          type="number"
-          name="currency"
-          value={currency}
-          onChange={handlerChange}
-          autoComplete="off"
-        />
-        <CurrencySelect
-          name="firstCurrency"
-          value={firstCurrency}
-          onChange={handlerChange}
-        />
-        <CurrencySelect
-          name="secondCurrency"
-          value={secondCurrency}
-          onChange={handlerChange}
-        />
-        <button type="submit">Convert</button>
-      </form>
-      <p>Converted sum: {convertedSum}</p>
-    </div>
-  )
+  return {
+    value,
+    onSubmit: handlerSubmitConverCur
+  };
 }
 
 const CurrencySelect = (props) => {

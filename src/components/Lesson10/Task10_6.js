@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCallback } from 'react';
 
 import './task10_6.css';
 
@@ -57,6 +58,11 @@ const User = (props) => {
     setIsEdit(false);
   };
 
+  const handleEditClick = useCallback(
+    () => setIsEdit(true),
+    [],
+  )
+
   return (
     <li className="item">
       <form>
@@ -65,7 +71,7 @@ const User = (props) => {
         <a
           href="!#"
           style={{display: isEdit ? 'none' : 'inline'}}
-          onClick={() => setIsEdit(true)}
+          onClick={handleEditClick}
         >
           edit
         </a>

@@ -12,36 +12,28 @@ const initialProducts = [
 ];
 
 const Task10_7 = () => {
-  const [products, setProducts] = useState(initialProducts);
-  const [checkets, setCheckets] = useState(initialProducts.map(_ => true));
+  const products = useProducts(initialProducts);
+  const checkets = useCheckeds(initialProducts.map(product => product.name));
 
-  const deleteProduct = (index) => {
-    setProducts(products.filter((_, i) => i !== index));
+  const handleDeleteValue = (name) => {
+    products.deleteValue(name);
+    checkets.deleteValue(name)
   };
 
   const addNewProduct = (product) => {
-    setProducts([...products, product]);
-    setCheckets([...checkets, true]);
+    products.addNewValue(product);
+    checkets.addNewValue(product.name);
   };
 
-  const handlerCheckProduct = (index) => {
-    setCheckets(checkets.map((check, i) => {
-      if (i === index) {
-        return !check;
-      }
 
-      return check;
-    }));
-  };
-
-  const rowsOfProduct = products.map((product, i) => (
+  const rowsOfProduct = products.value.map((product, i) => (
     <Product
-      key={i}
+      key={product.name}
       product={product}
       number={i}
-      deleteProduct={deleteProduct}
-      isChecked={checkets[i]}
-      onCheck={handlerCheckProduct}
+      deleteProduct={handleDeleteValue}
+      isChecked={checkets.value[i]}
+      onCheck={checkets.onCheck}
     />
   ));
 
@@ -63,10 +55,99 @@ const Task10_7 = () => {
         </tbody>
       </table>
       <AddingProduct addNewProduct={addNewProduct}/>
-      <AllCosts products={products} checkets={checkets}/>
+      <AllCosts products={products.value} checkets={checkets.value}/>
     </>
 
   );
+};
+
+const useProducts = (initialState) => {
+  const [value, setValue] = useState(initialState);
+
+  const handlerAddNewValue = (newValue) => {
+    setValue([...value, newValue])
+  };
+
+  const handlerDeleteValue = (name) => {
+    setValue(value.filter((product) => product.name !== name));
+  };
+
+  return {
+    value,
+    addNewValue: handlerAddNewValue,
+    deleteValue: handlerDeleteValue
+  }
+};
+
+const useCheckeds = (initialState) => {
+  const [value, setValue] = useState(initialState);
+
+  const handlerAddNewValue = (newValue) => {
+    setValue([...value, newValue])
+  };
+
+  const handlerDeleteValue = (name) => {
+    setValue(value.filter((product) => product !== name));
+  };
+
+  const handlerCheck = (index, name) => {
+    setValue(value.map((check, i) => {
+      if (i === index) {
+        return check ? '' : name;
+      }
+
+      return check;
+    }));
+  };
+
+  return {
+    value,
+    addNewValue: handlerAddNewValue,
+    deleteValue: handlerDeleteValue,
+    onCheck: handlerCheck
+  }
+};
+
+const useSumbitAddNewProduct = (name, price, count, addProduct) => {
+
+  const handlerSumbitAddProduct = (e) => {
+    e.preventDefault();
+
+    const newProduct = {
+      name: name.value,
+      price: price.value,
+      count: count.value
+    };
+
+    addProduct(newProduct);
+    name.onClear();
+    price.onClear();
+    count.onClear();
+  };
+
+  return {
+    onSubmit: handlerSumbitAddProduct
+  }
+};
+
+const useInputChange = (initialState) => {
+  const [value, setValue] = useState(initialState);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    name === 'name' ? setValue(value) : setValue(value.replace(/[^\d]/g, ''));
+  };
+
+  const handlerClearInput = () => {
+    setValue('');
+  };
+
+  return {
+    value,
+    onChange: handleChange,
+    onClear: handlerClearInput
+  };
 };
 
 const Product = (props) => {
@@ -95,7 +176,7 @@ const Product = (props) => {
         <button
           className="btn"
           type="button"
-          onClick={() => deleteProduct(number)}
+          onClick={() => deleteProduct(name)}
         >
           Delete
         </button>
@@ -105,72 +186,10 @@ const Product = (props) => {
           type="checkbox"
           name=""
           checked={isChecked}
-          onChange={() => onCheck(number)}
+          onChange={() => onCheck(number, name)}
         />
       </td>
     </tr>
-  );
-};
-
-const AddingProduct = (props) => {
-  const { addNewProduct } = props;
-
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [count, setCount] = useState('');
-
-  const handleChange = (e) => {
-    const {name, value} = e.target;
-
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-      case 'price':
-        setPrice(value.replace(/[^\d]/g, ''));
-        break;
-      case 'count':
-        setCount(value.replace(/[^\d]/g, ''));
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handlerSumbitAddProduct = (e) => {
-    e.preventDefault();
-
-    const newProduct = {name, price, count}
-
-    addNewProduct(newProduct);
-    clearAllStates();
-  };
-
-  const clearAllStates = () => {
-    setName('');
-    setPrice('');
-    setCount('');
-  };
-
-  return (
-    <form onSubmit={handlerSumbitAddProduct}>
-      <Input
-        name="name"
-        value={name}
-        onChange={handleChange}
-      />
-      <Input
-        name="price"
-        value={price}
-        onChange={handleChange}
-      />
-      <Input
-        name="count"
-        value={count}
-        onChange={handleChange}
-      />
-      <button className="btn btn-success" type="submit">Add product</button>
-    </form>
   );
 };
 
@@ -193,6 +212,36 @@ const Input = (props) => {
         autoComplete="off"
       />
     </div>
+  );
+};
+
+const AddingProduct = (props) => {
+  const { addNewProduct } = props;
+
+  const name = useInputChange('');
+  const price = useInputChange('');
+  const count = useInputChange('');
+  const submitNewProduct = useSumbitAddNewProduct(name, price, count, addNewProduct);
+
+  return (
+    <form onSubmit={submitNewProduct.onSubmit}>
+      <Input
+        name="name"
+        value={name.value}
+        onChange={name.onChange}
+      />
+      <Input
+        name="price"
+        value={price.value}
+        onChange={price.onChange}
+      />
+      <Input
+        name="count"
+        value={count.value}
+        onChange={count.onChange}
+      />
+      <button className="btn btn-success" type="submit">Add product</button>
+    </form>
   );
 };
 
