@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 import './task10_7.css';
 
@@ -113,41 +113,25 @@ const useSumbitAddNewProduct = (name, price, count, addProduct) => {
   const handlerSumbitAddProduct = (e) => {
     e.preventDefault();
 
+    const pattern = /^\d+$/;
+
     const newProduct = {
-      name: name.value,
-      price: price.value,
-      count: count.value
+      name: name.current.value,
+      price: price.current.value,
+      count: count.current.value
     };
 
-    addProduct(newProduct);
-    name.onClear();
-    price.onClear();
-    count.onClear();
+    if (pattern.test(newProduct.price) && pattern.test(newProduct.count)) {
+      addProduct(newProduct);
+      name.current.value = '';
+      price.current.value = '';
+      count.current.value = '';
+    }
   };
 
   return {
     onSubmit: handlerSumbitAddProduct
   }
-};
-
-const useInputChange = (initialState) => {
-  const [value, setValue] = useState(initialState);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    name === 'name' ? setValue(value) : setValue(value.replace(/[^\d]/g, ''));
-  };
-
-  const handlerClearInput = () => {
-    setValue('');
-  };
-
-  return {
-    value,
-    onChange: handleChange,
-    onClear: handlerClearInput
-  };
 };
 
 const Product = (props) => {
@@ -196,8 +180,7 @@ const Product = (props) => {
 const Input = (props) => {
   const {
     name,
-    value,
-    onChange,
+    inputRef
   } = props;
 
   return (
@@ -207,8 +190,7 @@ const Input = (props) => {
         className="input"
         type="text"
         name={name}
-        value={value}
-        onChange={onChange}
+        ref={inputRef}
         autoComplete="off"
       />
     </div>
@@ -218,27 +200,24 @@ const Input = (props) => {
 const AddingProduct = (props) => {
   const { addNewProduct } = props;
 
-  const name = useInputChange('');
-  const price = useInputChange('');
-  const count = useInputChange('');
+  const name = useRef();
+  const price = useRef();
+  const count = useRef();
   const submitNewProduct = useSumbitAddNewProduct(name, price, count, addNewProduct);
 
   return (
     <form onSubmit={submitNewProduct.onSubmit}>
       <Input
         name="name"
-        value={name.value}
-        onChange={name.onChange}
+        inputRef={name}
       />
       <Input
         name="price"
-        value={price.value}
-        onChange={price.onChange}
+        inputRef={price}
       />
       <Input
         name="count"
-        value={count.value}
-        onChange={count.onChange}
+        inputRef={count}
       />
       <button className="btn btn-success" type="submit">Add product</button>
     </form>
