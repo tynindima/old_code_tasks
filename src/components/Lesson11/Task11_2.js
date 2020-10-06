@@ -1,60 +1,91 @@
-import React, { useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useRef, useState } from 'react';
+
+const initialTests = [
+  {
+    question: 'Какая река длинее?',
+    right: 'Нил',
+  },
+  {
+    question: 'Сколько планет в солнечной системе?',
+    right: '8',
+  },
+  {
+    question: 'Сколько в JavaScript основных типов данных?',
+    right: '8',
+  },
+];
 
 const Task11_2 = () => {
-  const [users, setUsers] = React.useState([
-    { id: 'a', name: 'Robin' },
-    { id: 'b', name: 'Dennis' },
-  ]);
+  const tests = useRef(initialTests);
 
-  console.log('Render: Task');
+  console.log('All tests');
 
-  const [text, setText] = React.useState('');
-
-  const handleText = (event) => {
-    setText(event.target.value);
-  };
-
-  const handleAddUser = ()  =>{
-    setUsers(users.concat({ id: uuidv4(), name: text }));
-  };
-
-  const handleRemove = useCallback((id) => {
-    setUsers(users.filter((user) => user.id !== id));
-  }, [users]);
-
-  return (
-    <div>
-      <input type="text" value={text} onChange={handleText} />
-      <button type="button" onClick={handleAddUser}>
-        Add User
-      </button>
-
-      <List list={users} onRemove={handleRemove} />
-    </div>
-  );
-};
-
-const List = React.memo(({ list, onRemove }) => {
-  console.log('Render: List');
   return (
     <ul>
-      {list.map((item) => (
-        <ListItem key={item.id} item={item} onRemove={onRemove} />
+      {tests.current.map((test, i) => (
+        <Test
+          key={test.question}
+          test={test}
+          number={i + 1}
+        />
       ))}
     </ul>
   );
-});
+}
 
-const ListItem = React.memo(({ item, onRemove }) => {
-  console.log('Render: ListItem');
+const Test = ({test, number}) => {
+  const {
+    question,
+    right
+  } = test;
+  console.log('test');
+
+  const answer = useInputChange(right);
+
+  const message = answer.isChecked
+    ? <p style={{color: answer.isRight ? 'green' : 'red'}}>
+        Ваш ответ {answer.ref.current.value}: {answer.isRight ? 'правильно' : 'неправильно'}
+      </p>
+    : null;
+
   return (
     <li>
-      {item.name}
-      <button type="button" onClick={() => onRemove(item.id)}>
-        Remove
-      </button>
+      <p>{number}. {question}</p>
+      <form onSubmit={answer.onSubmit}>
+        <div style={{display: answer.isChecked ? 'none' : 'display'}}>
+          <input
+
+            type="text"
+            ref={answer.ref}
+          />
+        </div>
+        {message}
+        <button type="submit">Сдать тест</button>
+      </form>
     </li>
   );
-});
+};
+
+const useInputChange = (rightAnswer) => {
+  const ref = useRef();
+  const [isChecked, setIsChecked] = useState(false);
+  const [isRight, setIsRight] = useState(true);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    setIsChecked(true);
+
+    ref.current.value === rightAnswer
+    ? setIsRight(true)
+    : setIsRight(false);
+  }
+
+  return {
+    ref,
+    isChecked,
+    isRight,
+    onSubmit: handleSubmit
+  }
+};
 export default Task11_2;
