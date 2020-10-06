@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const Task11_2 = () => {
@@ -7,16 +7,21 @@ const Task11_2 = () => {
     { id: 'b', name: 'Dennis' },
   ]);
 
+  console.log('Render: Task');
+
   const [text, setText] = React.useState('');
-  console.log('Render: App');
 
   const handleText = (event) => {
     setText(event.target.value);
   };
 
-  const handleAddUser = () => {
+  const handleAddUser = ()  =>{
     setUsers(users.concat({ id: uuidv4(), name: text }));
   };
+
+  const handleRemove = useCallback((id) => {
+    setUsers(users.filter((user) => user.id !== id));
+  }, [users]);
 
   return (
     <div>
@@ -25,25 +30,31 @@ const Task11_2 = () => {
         Add User
       </button>
 
-      <List list={users} />
+      <List list={users} onRemove={handleRemove} />
     </div>
   );
 };
 
-const List = React.memo(({ list }) => {
-  console.log('Render: list');
+const List = React.memo(({ list, onRemove }) => {
+  console.log('Render: List');
   return (
     <ul>
       {list.map((item) => (
-        <ListItem key={item.id} item={item} />
+        <ListItem key={item.id} item={item} onRemove={onRemove} />
       ))}
     </ul>
   );
 });
 
-const ListItem = React.memo(({ item }) => {
+const ListItem = React.memo(({ item, onRemove }) => {
   console.log('Render: ListItem');
-  return <li>{item.name}</li>;
+  return (
+    <li>
+      {item.name}
+      <button type="button" onClick={() => onRemove(item.id)}>
+        Remove
+      </button>
+    </li>
+  );
 });
-
 export default Task11_2;
