@@ -6,18 +6,36 @@ const initialTests = [
   {
     question: "Какая река длинее?",
     right: "Нил",
+    answers: [
+      'Дунай',
+      'Амазонка',
+      'Янзцы',
+      'Нил',
+    ],
   },
   {
     question: "Сколько планет в солнечной системе?",
     right: "8",
+    answers: [
+      '9',
+      '10',
+      '8',
+      '7',
+    ],
   },
   {
     question: "Сколько в JavaScript основных типов данных?",
     right: "8",
+    answers: [
+      '9',
+      '5',
+      '7',
+      '8',
+    ],
   },
 ];
 
-const Task11_3 = () => {
+const Task11_4 = () => {
   const tests = useRef(initialTests);
   const answers = useAnswers([]);
   const showAnswer = useChangeBoolean(false);
@@ -67,17 +85,19 @@ const Tests = React.memo((props) => {
 
 const Test = React.memo((props) => {
   const { test, number, x, addAnswer } = props;
-  const { question, right } = test;
+  const { question, right, answers } = test;
 
-  const inputRef = useRef();
+  const currentAnswer = useChangeInput(null);
+
   const { isCheck, onSubmit } = useTestAnswer(
     addAnswer,
     question,
     right,
-    inputRef
+    currentAnswer.value
   );
 
   const paragraph = isCheck ? <p>Вопрос засчитан</p> : null;
+  const isButtonOn = currentAnswer.value === null;
 
   return (
     <li className="item" style={{ transform: `translateX(${x}%)` }}>
@@ -87,10 +107,28 @@ const Test = React.memo((props) => {
       {paragraph}
       <form
         onSubmit={onSubmit}
-        style={{ display: isCheck ? "none" : "display" }}
       >
-        <input type="text" ref={inputRef} />
-        <button type="submit">Ответить</button>
+        <ul className="list-answers" style={{display: isCheck ? 'none' : 'display'}}>
+          {answers.map((answer) => (
+            <li key={answer} className="item-answers">
+              <input
+                type="radio"
+                value={answer}
+                checked={answer === currentAnswer.value}
+                onChange={currentAnswer.onChange}
+              />
+              {` ${answer}`}
+            </li>
+
+          ))}
+        </ul>
+        <button
+          type="submit"
+          disabled={isButtonOn}
+          style={{display: isCheck ? 'none' : 'display'}}
+        >
+          Подтвердить
+        </button>
       </form>
     </li>
   );
@@ -166,15 +204,13 @@ const useAnswers = (initialState) => {
   };
 };
 
-const useTestAnswer = (addAnswer, question, right, input) => {
+const useTestAnswer = (addAnswer, question, right, answer) => {
   const [isCheck, setIsCheck] = useState(false);
 
   const handleSumbit = (e) => {
     e.preventDefault();
 
     setIsCheck(true);
-
-    const answer = input.current.value ? input.current.value : "";
 
     const newAnswer = {
       question: question,
@@ -204,4 +240,17 @@ const useChangeBoolean = (initialState) => {
   };
 };
 
-export default Task11_3;
+const useChangeInput = (initialState) => {
+  const [value, setValue] = useState(initialState);
+
+  const handleChange = ({ target }) => {
+    setValue(target.value);
+  };
+
+  return {
+    value,
+    onChange: handleChange
+  }
+};
+
+export default Task11_4;

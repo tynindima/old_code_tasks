@@ -6,18 +6,36 @@ const initialTests = [
   {
     question: "Какая река длинее?",
     right: "Нил",
+    answers: [
+      'Дунай',
+      'Амазонка',
+      'Янзцы',
+      'Нил',
+    ],
   },
   {
     question: "Сколько планет в солнечной системе?",
     right: "8",
+    answers: [
+      '9',
+      '10',
+      '8',
+      '7',
+    ],
   },
   {
     question: "Сколько в JavaScript основных типов данных?",
     right: "8",
+    answers: [
+      '9',
+      '5',
+      '7',
+      '8',
+    ],
   },
 ];
 
-const Task11_3 = () => {
+const Task11_5 = () => {
   const tests = useRef(initialTests);
   const answers = useAnswers([]);
   const showAnswer = useChangeBoolean(false);
@@ -29,7 +47,7 @@ const Task11_3 = () => {
       <Tests tests={tests.current} addAnswer={answers.addValue} />
       <button
         style={{ display: isOnBtn ? "block" : "none" }}
-        onClick={showAnswer.onClick}
+        onClick={showAnswer.onChange}
       >
         Проверить ответы
       </button>
@@ -67,17 +85,19 @@ const Tests = React.memo((props) => {
 
 const Test = React.memo((props) => {
   const { test, number, x, addAnswer } = props;
-  const { question, right } = test;
+  const { question, right, answers } = test;
 
-  const inputRef = useRef();
+  const currentAnswer = useChangeInput([]);
+
   const { isCheck, onSubmit } = useTestAnswer(
     addAnswer,
     question,
     right,
-    inputRef
+    currentAnswer.value
   );
 
   const paragraph = isCheck ? <p>Вопрос засчитан</p> : null;
+  const isButtonOn = !currentAnswer.value.length;
 
   return (
     <li className="item" style={{ transform: `translateX(${x}%)` }}>
@@ -87,11 +107,49 @@ const Test = React.memo((props) => {
       {paragraph}
       <form
         onSubmit={onSubmit}
-        style={{ display: isCheck ? "none" : "display" }}
       >
-        <input type="text" ref={inputRef} />
-        <button type="submit">Ответить</button>
+        <ul className="list-answers" style={{display: isCheck ? 'none' : 'display'}}>
+          {answers.map((answer) => (
+            <TestAnswer
+              key={answer}
+              answer={answer}
+              addAnswer={currentAnswer.onAdd}
+            />
+          ))}
+        </ul>
+        <button
+          type="submit"
+          disabled={isButtonOn}
+          style={{display: isCheck ? 'none' : 'display'}}
+        >
+          Подтвердить
+        </button>
       </form>
+    </li>
+  );
+});
+
+const TestAnswer = React.memo((props) => {
+  const {
+    answer,
+    addAnswer
+  } = props;
+
+  const checkbox = useChangeBoolean(false);
+
+  const handlerAddAsnwer = ({target}) => {
+    addAnswer(answer);
+    checkbox.onChange(target.value);
+  };
+
+  return (
+    <li key={answer} className="item-answers">
+      <input
+        type="checkbox"
+        checked={checkbox.value}
+        onChange={handlerAddAsnwer}
+      />
+      {` ${answer}`}
     </li>
   );
 });
@@ -123,9 +181,9 @@ const Answer = (props) => {
     myAnswer
   } = answer;
 
-  const message = right.toLowerCase() === myAnswer.toLowerCase()
-    ? <p style={{color: '#5cb85c'}}>Ваш ответ {myAnswer} - правильно</p>
-    : <p style={{color: '#d9534f'}}> Ваш ответ {myAnswer} - не правильно, правильный ответ - {right}</p>;
+  const message = myAnswer.includes(right)
+    ? <p style={{color: '#5cb85c'}}>Ваш ответ {right} - правильно</p>
+    : <p style={{color: '#d9534f'}}> Ваш ответ {myAnswer.join(',')} - не правильно, правильный ответ - {right}</p>;
 
   return (
     <li key={question}>
@@ -166,15 +224,13 @@ const useAnswers = (initialState) => {
   };
 };
 
-const useTestAnswer = (addAnswer, question, right, input) => {
+const useTestAnswer = (addAnswer, question, right, answer) => {
   const [isCheck, setIsCheck] = useState(false);
 
   const handleSumbit = (e) => {
     e.preventDefault();
 
     setIsCheck(true);
-
-    const answer = input.current.value ? input.current.value : "";
 
     const newAnswer = {
       question: question,
@@ -200,8 +256,25 @@ const useChangeBoolean = (initialState) => {
 
   return {
     value,
-    onClick: handlerChange,
+    onChange: handlerChange,
   };
 };
 
-export default Task11_3;
+const useChangeInput = (initialState) => {
+  const [value, setValue] = useState(initialState);
+
+  const handleChange = (answer) => {
+    if (value.includes(answer)) {
+      setValue(value.filter(item => item !== answer));
+    } else {
+      setValue([...value, answer]);
+    }
+  };
+
+  return {
+    value,
+    onAdd: handleChange
+  }
+};
+
+export default Task11_5;

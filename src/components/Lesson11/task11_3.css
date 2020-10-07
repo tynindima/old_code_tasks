@@ -16,3 +16,12 @@
   padding: 10px;
   transition: 0.5s;
 }
+
+.list-answers {
+  padding: 0;
+}
+
+.item-answers {
+  list-style: none;
+  padding: 5px;
+}
