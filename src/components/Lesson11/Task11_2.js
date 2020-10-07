@@ -54,7 +54,6 @@ const Test = ({test, number}) => {
       <form onSubmit={answer.onSubmit}>
         <div style={{display: answer.isChecked ? 'none' : 'display'}}>
           <input
-
             type="text"
             ref={answer.ref}
           />
