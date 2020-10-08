@@ -8,7 +8,7 @@
 
 .col {
   border: 1px solid black;
-  width: 100px;
+  min-width: 100px;
   padding: 5px;
   text-align: center;
 }
@@ -20,4 +20,20 @@
   border-radius: 6px;
   color: #fff;
   cursor: pointer;
+}
+
+.btn-warning {
+  background-color: #f0ad4e;
+}
+
+.btn-success {
+  background-color: #5cb85c;
+}
+
+.w-200 {
+  width: 200px;
+}
+
+.ml-50 {
+  margin-left: 50px;
 }
