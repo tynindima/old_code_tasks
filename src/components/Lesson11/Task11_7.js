@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useReducer, useRef, useState } from 'react';
 import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import './task11_7.scss';
 
@@ -35,55 +34,6 @@ const reducer = (state, action) => {
                   return {
                     ...day,
                     tasks: action.newTask
-                  }
-                }
-
-                return day;
-              })
-            };
-          }
-
-          return month;
-        })
-      };
-    case 'DELETE_TASK':
-      return {
-        ...state,
-        calendar: state.calendar.map(month => {
-          if (month.id === action.id) {
-            return {
-              ...month,
-              days: month.days.map(day => {
-                if (day.dayId === action.dayId) {
-                  return {
-                    ...day,
-                    tasks: day.tasks.filter((task, i) => i !== action.index)
-                  }
-                }
-
-                return day;
-              })
-            };
-          }
-
-          return month;
-        })
-      };
-    case 'CHANGE_TASK':
-      return {
-        ...state,
-        calendar: state.calendar.map(month => {
-          if (month.id === action.id) {
-            return {
-              ...month,
-              days: month.days.map(day => {
-                if (day.dayId === action.dayId) {
-                  const index = day.tasks.findIndex((task, i) => i === action.index);
-                  const changedTask = day.tasks.splice(index, 1, action.changedTask);
-
-                  return {
-                    ...day,
-                    tasks: changedTask
                   }
                 }
 
