@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useReducer, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import './task11_1.css';
@@ -8,30 +8,56 @@ const initialTodos = [
   {id: 2, task: 'Prepare breakfast'},
   {id: 3, task: 'Read the book'},
 ];
+const initialState = {
+  todos: initialTodos
+};
 
-const Task11_6 = () => {
-  const todos = useTaskManager(initialTodos);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return {
+        ...state,
+        todos: [...state.todos, action.newTodo]
+      };
+    case 'DELETE_TODO':
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.id)
+      };
+    case 'CHANGE_TODO':
+      const {todos} = state;
+      const {id, task} = action;
+      const index = todos.findIndex(item => item.id === id);
+      todos.splice(index, 1, {id, task});
+      return {
+        ...state,
+        todos,
+        }
+
+
+    default: return state;
+  }
+};
+
+const TodoDispatch = React.createContext(null);
+
+const Task11_6_r = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   console.log('Task');
 
   return (
-    <div>
-      <AddingNewTodo onAdd={todos.onAdd} />
-      <ListOfTodos
-        todos={todos.value}
-        onDelete={todos.onDelete}
-        onChange={todos.onChange}
-      />
-    </div>
+    <TodoDispatch.Provider value={dispatch}>
+      <div>
+        <AddingNewTodo />
+        <ListOfTodos todos={state.todos} />
+      </div>
+    </TodoDispatch.Provider>
   )
 };
 
 const ListOfTodos = React.memo((props) => {
-  const {
-    todos,
-    onDelete,
-    onChange
-  } = props;
+  const { todos } = props;
 
   console.log('ListOfTodos');
 
@@ -50,8 +76,6 @@ const ListOfTodos = React.memo((props) => {
           <Todo
             key={todo.id}
             todo={todo}
-            onDelete={onDelete}
-            onChange={onChange}
           />
         ))}
       </tbody>
@@ -62,10 +86,10 @@ const ListOfTodos = React.memo((props) => {
 const Todo = React.memo((props) => {
   const {
     todo,
-    onDelete,
-    onChange
   } = props;
   const { id, task } = todo;
+
+  const dispatch = useContext(TodoDispatch);
 
   console.log('Todo');
 
@@ -74,12 +98,12 @@ const Todo = React.memo((props) => {
   const taskInput = useChangeValue(task);
 
   const handlerChangeTask = () => {
-    onChange(id, taskInput.value);
+    dispatch({type: 'CHANGE_TODO', id, newTask: taskInput.value});
     isEdit.onChange();
   };
 
   const handlerDeleteTask = () => {
-    onDelete(id);
+    dispatch({type: 'DELETE_TODO', id});
   }
 
   const editBtn = isEdit.value
@@ -111,10 +135,8 @@ const Todo = React.memo((props) => {
   );
 });
 
-const AddingNewTodo = React.memo((props) => {
-  const {
-    onAdd
-  } = props;
+const AddingNewTodo = React.memo(() => {
+  const dispatch = useContext(TodoDispatch);
 
   console.log('Adding Todo');
 
@@ -130,7 +152,7 @@ const AddingNewTodo = React.memo((props) => {
       };
 
       inputRef.current.value = '';
-      onAdd(newTodo);
+      dispatch({type: 'ADD_TODO', newTodo});
     }
 
   };
@@ -142,42 +164,6 @@ const AddingNewTodo = React.memo((props) => {
     </form>
   );
 });
-
-const useTaskManager = (initialState) => {
-  const [value, setValue] = useState(initialState);
-
-  //adding new todo to our todoses
-  const handlerAddValue = useCallback((newValue) => {
-    setValue(c => [...c, newValue]);
-  }, []);
-
-  //deleted selected todo
-  const handlerDeleteValue = useCallback((id) => {
-    setValue(c => c.filter(item => item.id !== id));
-  }, []);
-
-
-  //changing text of task in selected todo
-  const handlerChangeValue = useCallback((id, changeItem) => {
-    setValue(c => c.map(item => {
-      if (item.id === id) {
-        return {
-          ...item,
-          task: changeItem
-        }
-      }
-
-      return item;
-    }));
-  }, []);
-
-  return {
-    value,
-    onAdd: handlerAddValue,
-    onDelete: handlerDeleteValue,
-    onChange: handlerChangeValue
-  };
-};
 
 const useBoolChange = (initialState) => {
   const [value, setValue] = useState(initialTodos);
@@ -205,4 +191,4 @@ const useChangeValue = (initialState) => {
   };
 };
 
-export default Task11_6;
+export default Task11_6_r;
