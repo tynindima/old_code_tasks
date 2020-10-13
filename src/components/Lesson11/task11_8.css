@@ -1,0 +1,68 @@
+.container {
+  position: relative;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.winner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 305px;
+  height: 305px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%);
+}
+
+.row {
+  display: flex;
+}
+
+.item {
+  width: 100px;
+  height: 100px;
+  margin: 1px;
+}
+
+
+.button-sell {
+  height: 100%;
+  width: 100%;
+  border: 1px solid gray;
+  background-color: steelblue;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.button-sell:hover {
+  opacity: 0.8;
+}
+
+.button-sell:active {
+  background-color: yellowgreen;
+}
+
+.button-sell:focus {
+  outline: none;
+}
+
+.btn-position {
+  position: absolute;
+  top: calc(50% + 155px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.btn {
+  padding: 8px 20px;
+  background-color: #5cb85c;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}

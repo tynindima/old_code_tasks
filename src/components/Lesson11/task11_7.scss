@@ -62,6 +62,15 @@ $days: 0, 1, 2, 3, 4, 5, 6;
   }
 }
 
+.marker {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-left: 10px;
+  background-color: green;
+  border-radius: 50%;
+}
+
 .btn {
   padding: 8px 20px;
   background-color: #d9534f;

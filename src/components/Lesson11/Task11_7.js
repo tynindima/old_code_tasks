@@ -96,6 +96,7 @@ const Month = (props) => {
             key={day.dayId}
             id={day.dayId}
             index={i}
+            day={day}
             onSelectDay={onSelectDay}
             onTodoOpen={onTodoOpen}
           />
@@ -104,12 +105,13 @@ const Month = (props) => {
   );
 };
 
-const Day = (props) => {
+const Day = React.memo((props) => {
   const {
     id,
     index,
     onSelectDay,
-    onTodoOpen
+    onTodoOpen,
+    day
   } = props;
 
   const handlerOpenTodo = () => {
@@ -117,15 +119,19 @@ const Day = (props) => {
     onTodoOpen(true);
   };
 
+  console.log(day.tasks);
+  const marker  = day.tasks.length ? <span className="marker"></span> : null;
+
   return (
     <div
       className="day"
       onClick={handlerOpenTodo}
     >
       {id}
+      {marker}
     </div>
   );
-};
+});
 
 //List of todos opening when user click on selected day
 const TodosList = (props) => {
@@ -284,9 +290,9 @@ const useSelectMonth = (initialState) => {
 const useTodosList = (initialState, currentMonth) => {
   const [todos, setTodos] = useState(initialState);
 
-  const handlerSelectDay = (index) => {
+  const handlerSelectDay = useCallback((index) => {
     setTodos(currentMonth[index]);
-  };
+  }, [currentMonth]);
 
   const handlerAddNewTask = (newTask) => {
     setTodos([...todos, newTask]);
@@ -313,9 +319,9 @@ const useTodosList = (initialState, currentMonth) => {
 const useBooleanTaggler = (initialState) => {
   const [value, setValue] = useState(initialState);
 
-  const handlerChange = (newValue) => {
+  const handlerChange = useCallback((newValue) => {
     setValue(newValue);
-  };
+  },[]);
 
   return {
     value,
@@ -332,7 +338,7 @@ const useTodos = (initialState) => {
 
   const handlerDeleteTodo = useCallback((index) => {
     setTodo(prev => ({...prev, tasks: prev.tasks.filter((_, i) => i !== index)}));
-  }, [todo]);
+  }, []);
 
   const hadnlerChange = (index, newTask) => {
     const tempTask = [...todo.tasks];
